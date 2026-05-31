@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#f4f6fb" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1115" media="(prefers-color-scheme: dark)">
+<title>美股投资三指标仪表盘 · 稳定部署版</title>
+<style>
+  :root{
+    --bg:#f5f7fb;--bg-soft:#eef3f9;--card:rgba(255,255,255,.76);--card-strong:rgba(255,255,255,.92);
+    --text:#121826;--muted:#667085;--line:rgba(15,23,42,.08);--line-strong:rgba(15,23,42,.12);
+    --shadow:0 10px 30px rgba(15,23,42,.07),0 2px 8px rgba(15,23,42,.04);
+    --blue:#0a84ff;--green:#30d158;--yellow:#ff9f0a;--orange:#ff7a00;--red:#ff453a;--gray:#8e8e93;
+    --content:1260px;--pad-x:clamp(14px,2.4vw,24px);--pad-y:clamp(18px,3vw,34px);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{--bg:#0f1115;--bg-soft:#151922;--card:rgba(28,28,30,.72);--card-strong:rgba(28,28,30,.92);
+      --text:#f5f7fb;--muted:#a8b2c3;--line:rgba(255,255,255,.08);--line-strong:rgba(255,255,255,.12);
+      --shadow:0 14px 40px rgba(0,0,0,.28),0 4px 14px rgba(0,0,0,.18);--green:#32d74b;--yellow:#ffd60a;--orange:#ff9f0a;--red:#ff6961;--gray:#98989d;}
+  }
+  *{box-sizing:border-box}html,body{min-height:100%}body{margin:0;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","PingFang SC","Helvetica Neue","Segoe UI",Arial,sans-serif;-webkit-font-smoothing:antialiased;background:radial-gradient(1200px 700px at -10% -10%,rgba(10,132,255,.10),transparent 62%),radial-gradient(950px 580px at 110% 0%,rgba(48,209,88,.08),transparent 56%),linear-gradient(180deg,var(--bg),var(--bg-soft))}
+  a,button{touch-action:manipulation}.wrap{width:min(100%,var(--content));margin:0 auto;padding:max(env(safe-area-inset-top),10px) max(env(safe-area-inset-right),var(--pad-x)) calc(max(env(safe-area-inset-bottom),20px) + 12px) max(env(safe-area-inset-left),var(--pad-x))}
+  .glass{background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}.hero{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:18px;padding-top:var(--pad-y)}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(10,132,255,.10);border:1px solid rgba(10,132,255,.14);color:var(--blue);font-size:13px;font-weight:700;margin-bottom:14px}.dot{width:8px;height:8px;border-radius:50%;background:currentColor;box-shadow:0 0 0 4px color-mix(in srgb,currentColor 16%,transparent)}
+  .title h1{margin:0;font-size:clamp(28px,4vw,42px);line-height:1.08;letter-spacing:-.045em;font-weight:800}.title p{margin:12px 0 0;max-width:900px;color:var(--muted);font-size:clamp(14px,1.7vw,16px);line-height:1.78}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;flex-shrink:0}.btn{appearance:none;border:1px solid var(--line-strong);border-radius:16px;background:var(--card-strong);color:var(--text);padding:12px 16px;min-height:46px;font-size:14px;font-weight:750;cursor:pointer;box-shadow:var(--shadow);white-space:nowrap}.btn:hover{transform:translateY(-1px)}.btn.primary{background:linear-gradient(180deg,color-mix(in srgb,var(--blue) 10%,var(--card-strong)),color-mix(in srgb,var(--blue) 4%,var(--card-strong)));border-color:color-mix(in srgb,var(--blue) 18%,var(--line-strong))}
+  .mobile-actions{display:none;position:sticky;top:max(env(safe-area-inset-top),8px);z-index:20;margin:4px 0 16px}.mobile-actions .action-bar{display:flex;gap:10px;padding:10px;border-radius:18px}.mobile-actions .btn{flex:1;min-width:0}
+  .summary-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}.mini-card{padding:18px;border-radius:20px;min-height:120px}.mini-title{font-size:13px;color:var(--muted);font-weight:700;margin-bottom:8px}.mini-value{font-size:clamp(22px,2.2vw,28px);font-weight:800;letter-spacing:-.03em;line-height:1.12}.mini-note{margin-top:8px;font-size:13px;color:var(--muted);line-height:1.6}
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px;align-items:start}.main-col,.side-col{display:grid;gap:18px}.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .card{padding:22px;border-radius:28px;position:relative;overflow:hidden}.card::after{content:"";position:absolute;right:-34px;bottom:-34px;width:132px;height:132px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.30),transparent 68%);pointer-events:none}.kicker{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:800;letter-spacing:-.02em;margin-bottom:20px}.icon{width:34px;height:34px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(10,132,255,.14),rgba(10,132,255,.07));border:1px solid rgba(10,132,255,.14);color:var(--blue);font-size:18px;flex:0 0 auto}
+  .value{font-size:clamp(42px,5vw,58px);line-height:1;font-weight:800;letter-spacing:-.05em;margin:0 0 8px;white-space:nowrap}.value small{font-size:clamp(20px,2vw,26px);color:var(--muted);font-weight:700}
+  .badge{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:999px;font-size:14px;font-weight:800;border:1px solid var(--line);background:rgba(142,142,147,.10);color:var(--gray);margin:10px 0 16px;min-height:38px}.badge::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor;box-shadow:0 0 0 4px color-mix(in srgb,currentColor 14%,transparent)}
+  .tone-blue{color:var(--blue);background:color-mix(in srgb,var(--blue) 12%,transparent);border-color:color-mix(in srgb,var(--blue) 20%,var(--line))}.tone-green{color:var(--green);background:color-mix(in srgb,var(--green) 12%,transparent);border-color:color-mix(in srgb,var(--green) 20%,var(--line))}.tone-yellow{color:var(--yellow);background:color-mix(in srgb,var(--yellow) 14%,transparent);border-color:color-mix(in srgb,var(--yellow) 22%,var(--line))}.tone-orange{color:var(--orange);background:color-mix(in srgb,var(--orange) 12%,transparent);border-color:color-mix(in srgb,var(--orange) 20%,var(--line))}.tone-red{color:var(--red);background:color-mix(in srgb,var(--red) 12%,transparent);border-color:color-mix(in srgb,var(--red) 20%,var(--line))}.tone-gray{color:var(--gray);background:color-mix(in srgb,var(--gray) 10%,transparent);border-color:var(--line)}
+  .desc{color:color-mix(in srgb,var(--text) 90%,transparent);line-height:1.8;font-size:15px;font-weight:600}.source{margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-size:13px;line-height:1.6;color:var(--muted);font-weight:700;overflow-wrap:anywhere}
+  .judge{min-height:250px}.judge h2,.rules h2,.linksCard h2,.footer-card h2{margin:0 0 16px;font-size:21px;letter-spacing:-.03em}.judgeText{font-size:clamp(26px,3vw,34px);font-weight:800;line-height:1.22;letter-spacing:-.04em;margin-bottom:12px}.judgeSub{font-size:16px;color:var(--muted);line-height:1.9;font-weight:600}.rules table{width:100%;border-collapse:collapse}.rules td{padding:16px 0;border-bottom:1px solid var(--line);font-size:15px;vertical-align:top}.rules td:first-child{width:72px;color:var(--muted);font-weight:700}.rules td:last-child{font-weight:800}
+  .status{border-radius:22px;padding:18px 20px;line-height:1.8;display:none;overflow-wrap:anywhere}.status.ok{background:color-mix(in srgb,var(--green) 10%,var(--card-strong));border-color:color-mix(in srgb,var(--green) 22%,var(--line))}.status.warn{background:color-mix(in srgb,var(--yellow) 10%,var(--card-strong));border-color:color-mix(in srgb,var(--yellow) 24%,var(--line))}.status.error{background:color-mix(in srgb,var(--red) 10%,var(--card-strong));border-color:color-mix(in srgb,var(--red) 22%,var(--line))}.status b{font-size:16px}.mini{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.6;max-height:260px;overflow:auto;padding-right:4px}
+  .linksCard,.footer-card{padding:20px;border-radius:24px}.quick-links{display:grid;grid-template-columns:1fr;gap:12px}.linkbox{display:block;text-decoration:none;color:var(--text);border:1px solid var(--line);border-radius:18px;padding:15px 16px;background:rgba(255,255,255,.28)}.linkbox strong{display:block;font-size:15px;margin-bottom:6px}.linkbox span{display:block;font-size:13px;color:var(--muted);line-height:1.55}.foot{color:var(--muted);font-size:13px;line-height:1.85}.pulse{animation:pulse 1.15s infinite alternate}@keyframes pulse{from{opacity:.55}to{opacity:1}}
+  @media(max-width:1180px){.layout{grid-template-columns:1fr}.side-col{grid-template-columns:1fr 1fr}.quick-links{grid-template-columns:repeat(3,1fr)}}@media(max-width:980px){.hero{align-items:stretch}.summary-strip{grid-template-columns:repeat(2,1fr)}.cards-grid{grid-template-columns:1fr}.side-col{grid-template-columns:1fr}.quick-links{grid-template-columns:1fr}}@media(max-width:720px){.hero{padding-top:10px;display:block;margin-bottom:14px}.hero .actions{display:none}.mobile-actions{display:block}.title p{line-height:1.72}.summary-strip{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.mini-card{padding:16px;min-height:112px}.main-col,.side-col,.layout,.cards-grid{gap:14px}.card,.linksCard,.footer-card,.status{padding:18px;border-radius:22px}.kicker{font-size:18px;margin-bottom:16px}.icon{width:30px;height:30px;font-size:15px;border-radius:10px}.desc,.judgeSub,.rules td{font-size:14px}.judge{min-height:auto}.source{font-size:12px}}@media(max-width:520px){.wrap{padding-left:max(env(safe-area-inset-left),12px);padding-right:max(env(safe-area-inset-right),12px)}.summary-strip{grid-template-columns:1fr}.mobile-actions .action-bar{padding:8px}.mobile-actions .btn{padding:12px 14px;font-size:14px}.value{font-size:40px}.judgeText{font-size:24px}.badge{font-size:13px;padding:8px 12px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <div class="title">
+      <div class="eyebrow"><span class="dot"></span>稳定部署版 · Vercel 后端读取</div>
+      <h1>美股投资三指标仪表盘</h1>
+      <p>前端只请求同域 <b>/api/market</b>，由 Vercel 后端函数统一读取 Yahoo / Stooq / FRED 数据，避免本地 HTML 直接跨域读取导致的慢、失败、代理不稳定问题。网页和 iPhone 都已适配。</p>
+    </div>
+    <div class="actions">
+      <button class="btn primary" onclick="refreshAll(true)">立即刷新</button>
+      <button class="btn" onclick="clearCacheAndRefresh()">清缓存重试</button>
+    </div>
+  </section>
+  <div class="mobile-actions"><div class="action-bar glass"><button class="btn primary" onclick="refreshAll(true)">立即刷新</button><button class="btn" onclick="clearCacheAndRefresh()">清缓存</button></div></div>
+
+  <section class="summary-strip">
+    <div class="mini-card glass"><div class="mini-title">当前综合状态</div><div class="mini-value" id="miniJudge">正在读取…</div><div class="mini-note" id="miniJudgeNote">系统会根据三个指标自动给出一句话判断。</div></div>
+    <div class="mini-card glass"><div class="mini-title">策略提醒</div><div class="mini-value">月度定投</div><div class="mini-note">平时按纪律执行，大跌时再重点加仓。</div></div>
+    <div class="mini-card glass"><div class="mini-title">关键阈值</div><div class="mini-value">VIX &gt; 40</div><div class="mini-note">出现极端恐慌时，再认真观察是否是重要机会。</div></div>
+    <div class="mini-card glass"><div class="mini-title">回撤参考</div><div class="mini-value">15%–20%</div><div class="mini-note">标普500从高点回撤到这个区间，再重点评估。</div></div>
+  </section>
+
+  <section class="layout">
+    <div class="main-col">
+      <article class="card glass judge"><h2>当前综合判断</h2><div class="judgeText" id="judgeText">正在读取数据…</div><div class="judgeSub" id="judgeSub">正在请求服务器端数据接口。首次部署后第一次打开可能稍慢，之后会走缓存更快。</div></article>
+      <section class="cards-grid">
+        <article class="card glass"><div class="kicker"><span class="icon">①</span><span>VIX 恐慌指数</span></div><div class="value" id="vixValue">--</div><div class="badge tone-blue pulse" id="vixBadge">读取中</div><div class="desc" id="vixDesc">低于15平静；15–25正常；25–40恐慌；超过40属于极端恐慌。</div><div class="source" id="vixSource">数据源：服务器端读取</div></article>
+        <article class="card glass"><div class="kicker"><span class="icon">②</span><span>美联储利率方向</span></div><div class="value"><span id="rateValue">--</span> <small>%</small></div><div class="badge tone-blue pulse" id="rateBadge">读取中</div><div class="desc" id="rateDesc">只看大方向：加息偏逆风，降息偏顺风，暂停说明估值环境没有继续明显恶化。</div><div class="source" id="rateSource">数据源：服务器端读取</div></article>
+        <article class="card glass"><div class="kicker"><span class="icon">③</span><span>标普500年内最大回撤</span></div><div class="value"><span id="ddValue">--</span> <small>%</small></div><div class="badge tone-blue pulse" id="ddBadge">读取中</div><div class="desc" id="ddDesc">计算方式：今年最高收盘价到最新收盘价的跌幅。</div><div class="source" id="ddSource">数据源：服务器端读取</div></article>
+      </section>
+      <div id="status" class="status glass"></div>
+    </div>
+    <aside class="side-col">
+      <article class="card glass rules"><h2>你的使用规则</h2><table><tr><td>VIX</td><td>大跌时看，重点看是否 &gt; 40</td></tr><tr><td>利率</td><td>每季度看一次方向即可</td></tr><tr><td>回撤</td><td>每月看，&gt;15%–20%再重点考虑</td></tr></table></article>
+      <article class="linksCard glass"><h2>备用查看入口</h2><div class="quick-links"><a class="linkbox" target="_blank" rel="noopener" href="https://www.cboe.com/tradable_products/vix/"><strong>VIX</strong><span>CBOE 官方页面</span></a><a class="linkbox" target="_blank" rel="noopener" href="https://fred.stlouisfed.org/series/FEDFUNDS"><strong>利率</strong><span>FRED 联邦基金利率</span></a><a class="linkbox" target="_blank" rel="noopener" href="https://www.tradingview.com/symbols/SPX/"><strong>标普500</strong><span>TradingView SPX</span></a></div></article>
+      <article class="footer-card glass"><h2>说明</h2><div class="foot">这个版本不再让浏览器直接跨域读取外部行情，而是由 Vercel 后端函数读取并缓存。免费公开数据仍可能有延迟，适合长期投资辅助，不适合日内交易。</div></article>
+    </aside>
+  </section>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const CACHE_KEY='market_dashboard_server_cache_v1';
+const CACHE_TTL=1000*60*10;
+const OLD_CACHE_TTL=1000*60*60*24;
+let state={vix:null,rate:null,dd:null};
+
+function cacheGet(allowOld=false){try{const x=JSON.parse(localStorage.getItem(CACHE_KEY)||'null');if(!x)return null;const age=Date.now()-x.t;if(age<(allowOld?OLD_CACHE_TTL:CACHE_TTL))return {...x.v,_age:age};}catch(e){}return null}
+function cacheSet(v){try{localStorage.setItem(CACHE_KEY,JSON.stringify({t:Date.now(),v}))}catch(e){}}
+function clearCacheAndRefresh(){localStorage.removeItem(CACHE_KEY);refreshAll(true)}
+function toneClass(c){return {blue:'tone-blue',green:'tone-green',yellow:'tone-yellow',orange:'tone-orange',red:'tone-red',gray:'tone-gray'}[c]||'tone-gray'}
+function setBadge(id,text,color){const el=$(id);el.textContent=text;el.classList.remove('pulse','tone-blue','tone-green','tone-yellow','tone-orange','tone-red','tone-gray');el.classList.add(toneClass(color))}
+function setLoading(){['vixBadge','rateBadge','ddBadge'].forEach(id=>{const el=$(id);el.textContent='读取中';el.classList.remove('tone-green','tone-yellow','tone-orange','tone-red','tone-gray');el.classList.add('tone-blue','pulse')});$('judgeText').textContent='正在读取数据…';$('judgeSub').textContent='正在请求服务器端数据接口。';$('miniJudge').textContent='正在读取…';$('miniJudgeNote').textContent='系统会根据三个指标自动给出一句话判断。'}
+function showStatus(type,html){const el=$('status');el.style.display='block';el.className='status glass '+(type||'');el.innerHTML=html}
+function hideStatus(){$('status').style.display='none'}
+function prettyDate(s){return s||'--'}
+
+function renderFromPayload(p, fromCache=false){
+  state={vix:p.vix||null,rate:p.rate||null,dd:p.drawdown||null};
+  if(state.vix) renderVix(state.vix,fromCache); else {setBadge('vixBadge','读取失败','red');$('vixDesc').textContent='服务器端未取得 VIX 数据。'}
+  if(state.rate) renderRate(state.rate,fromCache); else {setBadge('rateBadge','读取失败','red');$('rateDesc').textContent='服务器端未取得利率数据。'}
+  if(state.dd) renderDrawdown(state.dd,fromCache); else {setBadge('ddBadge','读取失败','red');$('ddDesc').textContent='服务器端未取得标普500回撤数据。'}
+  renderJudge();
+  const ok=[state.vix,state.rate,state.dd].filter(Boolean).length;
+  const errors=(p.errors||[]).map(e=>'• '+e).join('<br>');
+  const updated=p.updatedAt?new Date(p.updatedAt).toLocaleString():'--';
+  if(ok===3) showStatus('ok',`三个指标已读取成功。${fromCache?'当前显示的是本地缓存，后台会继续刷新。':'数据更新时间：'+updated}`);
+  else showStatus('warn',`部分数据读取失败：${ok}/3 项成功。${errors?'<div class="mini">'+errors+'</div>':''}`);
+}
+
+function renderVix(d,cached){$('vixValue').textContent=Number(d.value).toFixed(2);$('vixSource').textContent=`数据源：${cached?'本地缓存 / ':''}${d.source||'服务器端'}，日期：${prettyDate(d.date)}`;let label='正常波动',color='green',desc='15–25属于正常波动范围，不需要因为情绪指标改变长期策略。';if(d.value<15){label='极度平静';color='blue';desc='低于15，市场情绪非常平静，通常不适合因为恐慌而加仓。'}else if(d.value<25){label='正常波动';color='green'}else if(d.value<40){label='市场恐慌';color='orange';desc='25–40，市场已经明显紧张，可重点观察是否接近你的加仓区间。'}else{label='极端恐慌';color='red';desc='超过40，属于罕见极端恐慌区间，可结合回撤幅度考虑大跌加仓。'}setBadge('vixBadge',label,color);$('vixDesc').textContent=desc}
+function renderRate(d,cached){$('rateValue').textContent=Number(d.value).toFixed(2);$('rateSource').textContent=`数据源：${cached?'本地缓存 / ':''}${d.source||'服务器端'}，日期：${prettyDate(d.date)}`;let label='暂停/维持',color='yellow',desc='近几个月利率变化不大，说明当前主要是等待通胀和经济数据确认。';if(d.change>0.12){label='加息方向';color='orange';desc='近几个月利率上行，对成长股估值相对逆风。'}else if(d.change<-0.12){label='降息方向';color='green';desc='近几个月利率下行，对成长股和风险资产相对顺风。'}setBadge('rateBadge',label,color);$('rateDesc').textContent=desc}
+function renderDrawdown(d,cached){$('ddValue').textContent=Number(d.value).toFixed(2);$('ddSource').textContent=`数据源：${cached?'本地缓存 / ':''}${d.source||'服务器端'}，最新：${prettyDate(d.date)}，年内高点：${prettyDate(d.highDate)}`;let label='小幅回撤',color='green',desc='回撤较小，按原月度定投即可，不需要额外加仓。';const a=Math.abs(d.value);if(a>=20){label='深度回撤';color='red';desc='年内从高点回撤已超过20%，进入值得重点考虑加仓的区域。'}else if(a>=15){label='明显回撤';color='orange';desc='年内从高点回撤超过15%，可以开始认真评估分批加仓。'}else if(a>=8){label='中等回撤';color='yellow';desc='有一定回撤，但还没到你设定的重点加仓区间。'}setBadge('ddBadge',label,color);$('ddDesc').textContent=desc}
+function renderJudge(){const {vix,rate,dd}=state;if(!vix||!rate||!dd){$('judgeText').textContent='部分数据缺失，暂不做完整判断';$('judgeSub').textContent='已显示能读取到的指标。缺失项可点右侧备用入口查看，或稍后刷新。';$('miniJudge').textContent='部分缺失';$('miniJudgeNote').textContent='目前只显示已成功读取的指标。';return}const v=vix.value,a=Math.abs(dd.value);let score=0,points=[];if(v>=40){score+=2;points.push('VIX已超过40，情绪进入极端恐慌区。')}else if(v>=25){score+=1;points.push('VIX显示市场有明显恐慌，但还不是极端。')}else points.push('VIX没有进入极端恐慌区。');if(a>=20){score+=2;points.push('标普500年内回撤超过20%，已到深度回撤区。')}else if(a>=15){score+=1;points.push('标普500年内回撤超过15%，接近重点观察区。')}else points.push('标普500回撤未到15%–20%的重点加仓区。');if(rate.change<-0.12){score+=1;points.push('利率方向偏降息，对风险资产较友好。')}else if(rate.change>0.12){score-=1;points.push('利率方向偏加息，对成长股估值不友好。')}else points.push('利率大方向暂时维持，不构成明显新压力。');let title='按原计划月度定投即可',mini='常规定投',miniNote='三个指标没有同时指向极端机会，保持纪律即可。';if(score>=4){title='接近“大跌加仓”观察窗口';mini='重点观察';miniNote='恐慌与回撤都较明显，可以开始认真评估分批加仓。'}else if(score>=2){title='进入重点观察区，但不必冲动';mini='进入观察';miniNote='部分指标变差，但还不代表必须立即重仓动作。'}$('judgeText').textContent=title;$('judgeSub').textContent=points.join(' ');$('miniJudge').textContent=mini;$('miniJudgeNote').textContent=miniNote}
+
+async function refreshAll(force=false){
+  hideStatus();
+  const c=cacheGet(false);
+  if(c&&!force){renderFromPayload(c,true)}
+  else setLoading();
+  try{
+    const url='/api/market'+(force?('?t='+Date.now()):'');
+    const res=await fetch(url,{cache:force?'no-store':'default'});
+    const p=await res.json();
+    if(!res.ok) throw new Error(p.error||'服务器返回错误');
+    cacheSet(p);
+    renderFromPayload(p,false);
+  }catch(e){
+    const old=cacheGet(true);
+    if(old){renderFromPayload(old,true);showStatus('warn',`服务器刷新失败，已显示本地旧缓存。<div class="mini">${String(e.message||e)}</div>`)}
+    else {setBadge('vixBadge','读取失败','red');setBadge('rateBadge','读取失败','red');setBadge('ddBadge','读取失败','red');$('judgeText').textContent='服务器接口读取失败';$('judgeSub').textContent='请确认已经部署到 Vercel，而不是直接双击打开本地 HTML。';showStatus('error',`无法连接 /api/market。<div class="mini">${String(e.message||e)}</div>`)}
+  }
+}
+refreshAll(false);
+</script>
+</body>
+</html>
